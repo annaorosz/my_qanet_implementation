@@ -214,11 +214,11 @@ if __name__ == "__main__":
 
     # save train_eval and dev_eval
     with open('dataset2/train_eval.json', "w") as fh:
-    json.dump(train_eval, fh)
+        json.dump(train_eval, fh)
     with open('dataset2/dev_eval.json','w') as fh:
-    json.dump(dev_eval,fh)
+        json.dump(dev_eval,fh)
     with open('dataset2/test_eval.json','w') as fh:
-    json.dump(test_eval,fh)
+        json.dump(test_eval,fh)
 
     '''
     91594 / 111135 tokens have corresponding word embedding vector
