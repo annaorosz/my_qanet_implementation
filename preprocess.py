@@ -8,10 +8,13 @@ import pandas as pd
 
 
 def word_tokenize(sent):
+
     doc = nlp(sent)
     return [token.text for token in doc]
 
+
 def convert_idx(text, tokens):
+
     current = 0
     spans = []
     for token in tokens:
@@ -23,7 +26,9 @@ def convert_idx(text, tokens):
         current += len(token)
     return spans
 
+
 def process_file(filename, data_type, word_counter, char_counter):
+
     print("Generating {} examples...".format(data_type))
     examples = []
     eval_examples = {}
@@ -32,8 +37,7 @@ def process_file(filename, data_type, word_counter, char_counter):
         source = json.load(fh)
         for article in tqdm(source["data"]):
             for para in article["paragraphs"]:
-                context = para["context"].replace(
-                    "''", '" ').replace("``", '" ')
+                context = para["context"].replace("''", '" ').replace("``", '" ')
                 context_tokens = word_tokenize(context)
                 context_chars = [list(token) for token in context_tokens]
                 spans = convert_idx(context, context_tokens)
@@ -43,8 +47,7 @@ def process_file(filename, data_type, word_counter, char_counter):
                         char_counter[char] += len(para["qas"])
                 for qa in para["qas"]:
                     total += 1
-                    ques = qa["question"].replace(
-                        "''", '" ').replace("``", '" ')
+                    ques = qa["question"].replace("''", '" ').replace("``", '" ')
                     ques_tokens = word_tokenize(ques)
                     ques_chars = [list(token) for token in ques_tokens]
                     for token in ques_tokens:
@@ -66,8 +69,8 @@ def process_file(filename, data_type, word_counter, char_counter):
                         y1s.append(y1)
                         y2s.append(y2)
                     example = {"context_tokens": context_tokens, "context_chars": context_chars,
-                               "ques_tokens": ques_tokens,
-                               "ques_chars": ques_chars, "y1s": y1s, "y2s": y2s, "id": total}
+                               "ques_tokens": ques_tokens, "ques_chars": ques_chars,
+                               "y1s": y1s, "y2s": y2s, "id": total}
                     examples.append(example)
                     eval_examples[str(total)] = {
                         "context": context, "spans": spans, "answers": answer_texts, "uuid": qa["id"]}
@@ -75,7 +78,9 @@ def process_file(filename, data_type, word_counter, char_counter):
         print("{} questions in total".format(len(examples)))
     return examples, eval_examples
 
+
 def get_embedding(counter, data_type, limit=-1, emb_file=None, size=None, vec_size=None):
+
     print("Generating {} embedding...".format(data_type))
     embedding_dict = {}
     filtered_elements = [k for k, v in counter.items() if v > limit]
@@ -92,8 +97,7 @@ def get_embedding(counter, data_type, limit=-1, emb_file=None, size=None, vec_si
     else:
         assert vec_size is not None
         for token in filtered_elements:
-            embedding_dict[token] = [np.random.normal(
-                scale=0.1) for _ in range(vec_size)]
+            embedding_dict[token] = [np.random.normal(scale=0.1) for _ in range(vec_size)]
         print("{} tokens have corresponding embedding vector".format(
             len(filtered_elements)))
 
@@ -114,9 +118,8 @@ def get_embedding(counter, data_type, limit=-1, emb_file=None, size=None, vec_si
     return emb_mat, token2idx_dict, idx2token_dict
 
 
-
-
 def get_indexs(exa, word2idx_dict, char2idx_dict, cont_limit=400, ques_limit=50, ans_limit=30, char_limit=16):
+
     n=len(exa)
     miss_word=0
     miss_char=0
@@ -204,12 +207,10 @@ if __name__ == "__main__":
 
     nlp = spacy.blank("en")
 
-
     word_counter, char_counter = Counter(), Counter()
-    train_examples, train_eval = process_file('../../fwei/data/squad/train-v1.2.json', "train", word_counter, char_counter)
-    dev_examples, dev_eval = process_file('../../fwei/data/squad/dev-v1.2.json', "dev", word_counter, char_counter)
-    test_examples, test_eval = process_file('../../fwei/data/squad/dev-v1.1.json', "dev", word_counter, char_counter)
-
+    train_examples, train_eval = process_file('data/squad/train-v1.1.json', "train", word_counter, char_counter)
+    dev_examples, dev_eval = process_file('data/squad/dev-v1.1.json', "dev", word_counter, char_counter)
+    test_examples, test_eval = process_file('data/squad/dev-v1.1.json', "dev", word_counter, char_counter)
 
     # save train_eval and dev_eval
     with open('dataset2/train_eval.json', "w") as fh:
@@ -219,20 +220,36 @@ if __name__ == "__main__":
     with open('dataset2/test_eval.json','w') as fh:
     json.dump(test_eval,fh)
 
-
+    '''
+    91594 / 111135 tokens have corresponding word embedding vector
+    wors_emb_mat --- list of 300 dim lists for each word, vocab size: 91596
+    word2idx_dict --- keys are words, vals are indices 
+    id2word_dict --- keys are indices, vals are words, first is --NULL-- last is --OOV--'''
     word_emb_mat, word2idx_dict, id2word_dict = get_embedding(
-    word_counter, "word", emb_file='../../fwei/data/glove/glove.840B.300d.txt', size=int(2.2e6), vec_size=300)
+        word_counter, "word", emb_file='data/glove/glove.840B.300d.txt', size=int(2.2e6), vec_size=300)
+    '''
+    char_emb_mat -- list with 1427 elems - each elem is a 200 dim vector, random init values in [-1; +1], first is --NULL-- last is --OOV--
+    char2idx_dict -- keys are chars, vals are indices
+    id2char_dict -- keys are indices, vals are chars'''
     char_emb_mat, char2idx_dict, id2char_dict = get_embedding(
-    char_counter, "char", emb_file=None, size=None, vec_size=200)
-
+        char_counter, "char", emb_file=None, size=None, vec_size=200)
 
     # save id2word
     df_id2word=[]
     for k in id2word_dict:
-    df_id2word.append([k,id2word_dict[k]])
+        df_id2word.append([k,id2word_dict[k]])
     df_id2word=pd.DataFrame(df_id2word)
     df_id2word.to_csv('id2word.csv',index=None)
 
+    word_size=len(word_emb_mat)
+    char_input_size=len(char_emb_mat)-1
+    print(word_size)
+    print(char_input_size)
+    word_mat=np.zeros((len(word_emb_mat),len(word_emb_mat[0])))
+    for i,w in enumerate(word_emb_mat):
+        word_mat[i,:]=w
+    print(word_mat.shape)
+    np.save('dataset/word_emb_mat3.npy',word_mat)
 
     contw_input, quesw_input, contc_input, quesc_input, cont_len, ques_len, y_start, y_end, qid\
     =get_indexs(train_examples, word2idx_dict, char2idx_dict)
@@ -273,6 +290,16 @@ if __name__ == "__main__":
     np.save('dataset2/test_y_end.npy',y_end)
     np.save('dataset2/test_qid.npy',qid)
 
-
     a=np.load('dataset2/train_y_start.npy')
+
+    print('char_emb_mat is a list, has no shape - its len: {}'.format(len(char_emb_mat)))
+    char_size=len(char_emb_mat)
+    char_input_size=len(char_emb_mat)-1
+    print('char_size: {}'.format(char_size))
+    print('(NEVER USED) char_input_size: {}'.format(char_input_size))
+    char_mat=np.zeros((len(char_emb_mat),len(char_emb_mat[0])))
+    for i,w in enumerate(char_emb_mat):
+        char_mat[i,:]=w
+    print(char_mat.shape)
+    np.save('char_emb_mat3.npy',char_mat)
 
