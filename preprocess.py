@@ -213,11 +213,11 @@ if __name__ == "__main__":
     test_examples, test_eval = process_file('data/squad/dev-v1.1.json', "dev", word_counter, char_counter)
 
     # save train_eval and dev_eval
-    with open('dataset2/train_eval.json', "w") as fh:
+    with open('dataset/train_eval.json', "w") as fh:
         json.dump(train_eval, fh)
-    with open('dataset2/dev_eval.json','w') as fh:
+    with open('dataset/dev_eval.json','w') as fh:
         json.dump(dev_eval,fh)
-    with open('dataset2/test_eval.json','w') as fh:
+    with open('dataset/test_eval.json','w') as fh:
         json.dump(test_eval,fh)
 
     '''
@@ -254,52 +254,49 @@ if __name__ == "__main__":
     contw_input, quesw_input, contc_input, quesc_input, cont_len, ques_len, y_start, y_end, qid\
     =get_indexs(train_examples, word2idx_dict, char2idx_dict)
 
-    np.save('dataset2/train_contw_input.npy',contw_input)
-    np.save('dataset2/train_quesw_input.npy',quesw_input)
-    np.save('dataset2/train_contc_input.npy',contc_input)
-    np.save('dataset2/train_quesc_input.npy',quesc_input)
-    np.save('dataset2/train_cont_len.npy',cont_len)
-    np.save('dataset2/train_ques_len.npy',ques_len)
-    np.save('dataset2/train_y_start.npy',y_start)
-    np.save('dataset2/train_y_end.npy',y_end)
-    np.save('dataset2/train_qid.npy',qid)
+    np.save('dataset/train_contw_input.npy',contw_input)
+    np.save('dataset/train_quesw_input.npy',quesw_input)
+    np.save('dataset/train_contc_input.npy',contc_input)
+    np.save('dataset/train_quesc_input.npy',quesc_input)
+    np.save('dataset/train_cont_len.npy',cont_len)
+    np.save('dataset/train_ques_len.npy',ques_len)
+    np.save('dataset/train_y_start.npy',y_start)
+    np.save('dataset/train_y_end.npy',y_end)
+    np.save('dataset/train_qid.npy',qid)
 
     contw_input, quesw_input, contc_input, quesc_input, cont_len, ques_len, y_start, y_end, qid\
     =get_indexs(dev_examples, word2idx_dict, char2idx_dict)
 
-    np.save('dataset2/dev_contw_input.npy',contw_input)
-    np.save('dataset2/dev_quesw_input.npy',quesw_input)
-    np.save('dataset2/dev_contc_input.npy',contc_input)
-    np.save('dataset2/dev_quesc_input.npy',quesc_input)
-    np.save('dataset2/dev_cont_len.npy',cont_len)
-    np.save('dataset2/dev_ques_len.npy',ques_len)
-    np.save('dataset2/dev_y_start.npy',y_start)
-    np.save('dataset2/dev_y_end.npy',y_end)
-    np.save('dataset2/dev_qid.npy',qid)
+    np.save('dataset/dev_contw_input.npy',contw_input)
+    np.save('dataset/dev_quesw_input.npy',quesw_input)
+    np.save('dataset/dev_contc_input.npy',contc_input)
+    np.save('dataset/dev_quesc_input.npy',quesc_input)
+    np.save('dataset/dev_cont_len.npy',cont_len)
+    np.save('dataset/dev_ques_len.npy',ques_len)
+    np.save('dataset/dev_y_start.npy',y_start)
+    np.save('dataset/dev_y_end.npy',y_end)
+    np.save('dataset/dev_qid.npy',qid)
 
     contw_input, quesw_input, contc_input, quesc_input, cont_len, ques_len, y_start, y_end, qid\
     =get_indexs(test_examples, word2idx_dict, char2idx_dict)
 
-    np.save('dataset2/test_contw_input.npy',contw_input)
-    np.save('dataset2/test_quesw_input.npy',quesw_input)
-    np.save('dataset2/test_contc_input.npy',contc_input)
-    np.save('dataset2/test_quesc_input.npy',quesc_input)
-    np.save('dataset2/test_cont_len.npy',cont_len)
-    np.save('dataset2/test_ques_len.npy',ques_len)
-    np.save('dataset2/test_y_start.npy',y_start)
-    np.save('dataset2/test_y_end.npy',y_end)
-    np.save('dataset2/test_qid.npy',qid)
+    np.save('dataset/test_contw_input.npy',contw_input)
+    np.save('dataset/test_quesw_input.npy',quesw_input)
+    np.save('dataset/test_contc_input.npy',contc_input)
+    np.save('dataset/test_quesc_input.npy',quesc_input)
+    np.save('dataset/test_cont_len.npy',cont_len)
+    np.save('dataset/test_ques_len.npy',ques_len)
+    np.save('dataset/test_y_start.npy',y_start)
+    np.save('dataset/test_y_end.npy',y_end)
+    np.save('dataset/test_qid.npy',qid)
 
-    a=np.load('dataset2/train_y_start.npy')
+    a=np.load('dataset/train_y_start.npy')
 
-    print('char_emb_mat is a list, has no shape - its len: {}'.format(len(char_emb_mat)))
     char_size=len(char_emb_mat)
     char_input_size=len(char_emb_mat)-1
-    print('char_size: {}'.format(char_size))
-    print('(NEVER USED) char_input_size: {}'.format(char_input_size))
     char_mat=np.zeros((len(char_emb_mat),len(char_emb_mat[0])))
+
     for i,w in enumerate(char_emb_mat):
         char_mat[i,:]=w
-    print(char_mat.shape)
     np.save('char_emb_mat3.npy',char_mat)
 
